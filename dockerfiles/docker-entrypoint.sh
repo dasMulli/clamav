@@ -10,13 +10,6 @@
 
 set -eu
 
-if [ ! -d "/run/clamav" ]; then
-	install -d -g "clamav" -m 775 -o "clamav" "/run/clamav"
-fi
-
-# Assign ownership to the database directory, just in case it is a mounted volume
-chown -R clamav:clamav /var/lib/clamav
-
 # run command if it is not starting with a "-" and is an executable in PATH
 if [ "${#}" -gt 0 ] && \
    [ "${1#-}" = "${1}" ] && \
@@ -30,10 +23,6 @@ else
 		exec clamd "${@}"
 	fi
 	# else default to running clamav's servers
-
-	# Help tiny-init a little
-	mkdir -p "/run/lock"
-	ln -f -s "/run/lock" "/var/lock"
 
 	# Ensure we have some virus data, otherwise clamd refuses to start
 	if [ ! -f "/var/lib/clamav/main.cvd" ]; then
